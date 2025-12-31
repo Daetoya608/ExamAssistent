@@ -22,6 +22,9 @@ class DefaultSettings(BaseSettings):
     POSTGRES_PORT: int = int(environ.get("POSTGRES_PORT", "5432")[-4:])
     POSTGRES_PASSWORD: str = environ.get("POSTGRES_PASSWORD", "hackme")
 
+    CHUNK_SIZE: int = int(environ.get("CHUNK_SIZE", 800))
+    CHUNK_OVERLAP: int = int(environ.get("CHUNK_OVERLAP", 200))
+
     # FRONTEND_URL: str = environ.get("FRONTEND_URL", "http://localhost:3000")
 
     # JWT_SECRET_KEY: str = environ.get("JWT_SECRET_KEY", "secret")
