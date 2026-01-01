@@ -1,12 +1,12 @@
-from pprint import pprint
 from pathlib import Path
 
 import pymupdf
 from pydantic import ValidationError
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-from app.infrastructure.parsers.pdf_parser.schemas import PDFBase, PDFPage, ChunkMetadata, ChunkBase
+from app.domains.documents.schemas import PDFBase, ChunkBase
 from app.core.config.utils import get_settings
+
 
 class ParserPDF:
     def __init__(self, pdf_file_path: Path):
@@ -58,15 +58,12 @@ class ParserPDF:
         chunks = list()
         texts = text_splitter.split_text(self.pdf_model.pages[page_index].content)
         for chunk_index, chunk_text in enumerate(texts):
-            chunk_metadata = ChunkMetadata(
+            chunk_model = ChunkBase(
+                content=chunk_text,
                 file_id=None,
                 source=self.pdf_model.pages[page_index].metadata.source,
                 page_num=self.pdf_model.pages[page_index].metadata.page,
                 chunk_index=chunk_index,
-            )
-            chunk_model = ChunkBase(
-                metadata=chunk_metadata,
-                content=chunk_text,
             )
             chunks.append(chunk_model)
         return chunks
