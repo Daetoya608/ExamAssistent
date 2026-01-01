@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class Metadata(BaseModel):
@@ -19,6 +19,7 @@ class PDFPage(BaseModel):
 
 class PDFBase(BaseModel):
     pages: Annotated[list[PDFPage], Field(default_factory=list, description="Списки страниц")]
+    file_id: Annotated[str, Field(default=None, description="Идентификатор документа")]
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -30,6 +31,5 @@ class ChunkMetadata(BaseModel):
     chunk_index: Annotated[int, Field(description="Индекс чанка")]
 
 
-class ChunkBase(BaseModel):
+class ChunkBase(ChunkMetadata):
     content: Annotated[str, Field(description="Текст чанка")]
-    metadata: Annotated[ChunkMetadata, Field(description="Метаданные чанка")]

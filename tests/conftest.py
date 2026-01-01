@@ -3,6 +3,8 @@ from pathlib import Path
 import pymupdf
 from unittest.mock import patch, MagicMock
 
+from app.infrastructure.vector_db.qdrant.docs_repository import QdrantFilesRepository
+
 
 @pytest.fixture
 def mock_settings():
@@ -32,3 +34,28 @@ def temp_pdf_file(tmp_path):
     doc.save(pdf_path)
     doc.close()
     return pdf_path
+
+
+@pytest.fixture
+def mock_encoder():
+    # ПУТЬ: убедитесь, что здесь docs_repository
+    with patch('app.infrastructure.vector_db.qdrant.docs_repository.SentenceTransformer') as mock:
+        instance = mock.return_value
+        instance.get_sentence_embedding_dimension.return_value = 1024
+        mock_vector = MagicMock()
+        mock_vector.tolist.return_value = [0.1] * 1024
+        instance.encode.return_value = mock_vector
+        yield instance
+
+@pytest.fixture
+def repo(mock_encoder):
+    # Патчим QdrantClient, чтобы он не лез в сеть
+    with patch('app.infrastructure.vector_db.qdrant.docs_repository.QdrantClient') as mock_client:
+        from app.infrastructure.vector_db.qdrant.docs_repository import QdrantFilesRepository
+        repository = QdrantFilesRepository(
+            collection_name="test_collection",
+            qdrant_url="http://localhost:6333"
+        )
+        # Явно делаем клиент моком, чтобы работал .return_value
+        repository.client = MagicMock()
+        yield repository

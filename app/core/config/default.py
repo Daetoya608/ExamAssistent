@@ -22,10 +22,11 @@ class DefaultSettings(BaseSettings):
     POSTGRES_PORT: int = int(environ.get("POSTGRES_PORT", "5432")[-4:])
     POSTGRES_PASSWORD: str = environ.get("POSTGRES_PASSWORD", "hackme")
 
-    CHUNK_SIZE: int = int(environ.get("CHUNK_SIZE", 800))
-    CHUNK_OVERLAP: int = int(environ.get("CHUNK_OVERLAP", 200))
+    QDRANT_HOST: str = environ.get("QDRANT_HOST", "localhost")
+    QDRANT_PORT: int = int(environ.get("QDRANT_PORT", "6333")[-4:])
 
-    # FRONTEND_URL: str = environ.get("FRONTEND_URL", "http://localhost:3000")
+    CHUNK_SIZE: int = int(environ.get("CHUNK_SIZE", "800"))
+    CHUNK_OVERLAP: int = int(environ.get("CHUNK_OVERLAP", "200"))
 
     # JWT_SECRET_KEY: str = environ.get("JWT_SECRET_KEY", "secret")
     # JWT_AUDIENCE: str = environ.get("JWT_AUDIENCE", "promoters")
@@ -49,6 +50,13 @@ class DefaultSettings(BaseSettings):
     # SENTRY_SEND_DEFAULT_PII: bool = (
     #     environ.get("SENTRY_SEND_DEFAULT_PII", "false").lower() == "true"
     # )
+
+    @property
+    def qdrant_uri(self) -> str:
+        """
+        Get uri for connection with vector database
+        """
+        return "http://{host}:{port}"
 
     @property
     def database_settings(self) -> dict:
