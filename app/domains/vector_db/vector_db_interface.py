@@ -1,10 +1,10 @@
 from abc import ABC, abstractmethod
-from typing import List, Dict, Any, Optional
+from typing import List, Optional
 
 from app.domains.documents.schemas import ChunkBase
 
 
-class VectorDBRepository(ABC):
+class VectorDBInterface(ABC):
 
     @abstractmethod
     def init_storage(self) -> None:

@@ -28,6 +28,11 @@ class DefaultSettings(BaseSettings):
     CHUNK_SIZE: int = int(environ.get("CHUNK_SIZE", "800"))
     CHUNK_OVERLAP: int = int(environ.get("CHUNK_OVERLAP", "200"))
 
+    B2_KEY_ID: str = environ.get("B2_KEY_ID", None)
+    B2_APPLICATION_KEY: str = environ.get("B2_APPLICATION_KEY", None)
+    B2_ENDPOINT: str = environ.get("B2_ENDPOINT", None)
+    B2_BUCKET_NAME: str = environ.get("B2_BUCKET_NAME", None)
+
     # JWT_SECRET_KEY: str = environ.get("JWT_SECRET_KEY", "secret")
     # JWT_AUDIENCE: str = environ.get("JWT_AUDIENCE", "promoters")
     # JWT_ISSUER: str = environ.get("JWT_ISSUER", "promoter-app")
