@@ -41,6 +41,7 @@ class ChunkBase(ChunkMetadata):
 class DocumentBase(BaseModel):
     user_id: Annotated[int, Field(description="ID владельца")]
     key: Annotated[str, Field(description="Ключ документа")]
+    filename: Annotated[str, Field(default=None, description="название файла")]
 
 
 class DocumentCreate(DocumentBase):

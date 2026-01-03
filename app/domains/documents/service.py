@@ -1,3 +1,4 @@
+from uuid import uuid4
 from pathlib import Path
 
 import pymupdf
@@ -7,6 +8,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from app.core.config.utils import get_settings
 from app.domains.documents.schemas import PDFBase, ChunkBase
 from app.domains.documents.repo_interface import DocumentRepositoryInterface
+from app.domains.documents.parser_interface import ParserInterface
 
 
 class DocumentServiceBase:
@@ -50,9 +52,16 @@ class DocumentService(DocumentServiceBase):
     def __init__(
             self,
             document_repo: DocumentRepositoryInterface,
+            parser: ParserInterface,
             chunk_size: int = None,
             chunk_overlap: int = None,
-            text_splitter = None
+            text_splitter = None,
     ):
         super().__init__(chunk_size, chunk_overlap, text_splitter)
         self.document_repo = document_repo
+        self.parser = parser
+
+
+    @staticmethod
+    def generate_name():
+        return uuid4()

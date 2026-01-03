@@ -1,5 +1,5 @@
 import os
-from typing import IO, Any, BinaryIO, Union
+from typing import IO, Any, Union
 import io
 
 import boto3
@@ -39,17 +39,20 @@ class BackblazeStorage(FileStorage):
 
     def save(
             self,
-            file_obj: BinaryIO,
+            file_obj: io.BytesIO,
             filename: str,
             folder: str = "",
             content_type: str = "application/octet-stream"
     ) -> str:
         key = get_key(filename, folder)
+
+        # temp_buffer = io.BytesIO(file_obj.getvalue())
         self._upload_obj(file_obj, key)
+        # file_obj.seek(0)
         return key
 
 
-    def download(self, file_id: str, destination: Union[str, BinaryIO]) -> None:
+    def download(self, file_id: str, destination: Union[str, io.BytesIO]) -> None:
         if isinstance(destination, str):
             with open(destination, 'wb') as f:
                 self.client.download_fileobj(self._bucket_name, file_id, f)

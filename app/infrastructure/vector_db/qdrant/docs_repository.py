@@ -6,19 +6,20 @@ from sentence_transformers import SentenceTransformer
 from app.domains.documents.schemas import ChunkBase
 from app.domains.vector_db.vector_db_interface import VectorDBInterface
 from app.infrastructure.vector_db.qdrant.utils import (get_qdrant_url, get_points_from_chunks,
-                                                       get_chunks_from_scored_points, get_encoder)
+                                                       get_chunks_from_scored_points, get_encoder,
+                                                       get_collection_name)
 
 
 class QdrantFilesRepository(VectorDBInterface):
     def __init__(
             self,
-            collection_name: str,
+            collection_name: str = None,
             qdrant_url = None,
-            parallel_count: int = 1,
-            max_retries: int = 1,
+            parallel_count: int = 4,
+            max_retries: int = 3,
             encoder = None,
     ):
-        self.collection_name = collection_name
+        self.collection_name = get_collection_name(collection_name)
         self.client = QdrantClient(url=get_qdrant_url(qdrant_url))
         self.encoder = get_encoder(encoder)
         self.parallel_count = parallel_count
@@ -46,10 +47,17 @@ class QdrantFilesRepository(VectorDBInterface):
 
 
     def upsert_batches(self, chunks: List[ChunkBase]) -> None:
+        # points = get_points_from_chunks(chunks, self.encoder)
+        # self.client.upsert(
+        #     collection_name=self.collection_name,
+        #     points=points,
+        # )
         points = get_points_from_chunks(chunks, self.encoder)
-        self.client.upsert(
+        self.client.upload_points(
             collection_name=self.collection_name,
             points=points,
+            parallel=self.parallel_count,
+            max_retries=self.max_retries,
         )
 
 

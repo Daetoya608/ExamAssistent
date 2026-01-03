@@ -1,5 +1,6 @@
 from os import environ
 from functools import lru_cache
+from urllib.parse import urlparse
 
 from app.core.config.default import DefaultSettings
 
@@ -13,3 +14,7 @@ def get_settings() -> DefaultSettings:
     # space for other settings
     # ...
     return DefaultSettings()  # fallback to default
+
+
+def get_hostname(url: str) -> str:
+    return urlparse(url).netloc

@@ -59,8 +59,28 @@ def get_sync_session() -> Session:
     return session
 
 
+def init_models_sync() -> None:
+    """
+    Синхронно создаёт все таблицы в базе данных.
+    Использует sync_uri (например, для SQLite).
+    """
+    # 1. Получаем настройки
+    settings = get_settings()
+    sync_uri = settings.database_uri_sync
+
+    # 2. Создаем синхронный движок
+    # echo=True полезен при инициализации, чтобы видеть SQL-запросы создания
+    engine = create_engine(sync_uri, echo=True, future=True)
+
+    # 3. Создаем таблицы
+    Base.metadata.create_all(bind=engine)
+
+    print(f"✅ [Sync] Таблицы успешно созданы в {sync_uri}")
+
+
 __all__ = [
     "get_session",
     "get_sync_session",
     "SessionManager",
+    "init_models_sync"
 ]

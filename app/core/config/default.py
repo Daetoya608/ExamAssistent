@@ -25,13 +25,16 @@ class DefaultSettings(BaseSettings):
     QDRANT_HOST: str = environ.get("QDRANT_HOST", "localhost")
     QDRANT_PORT: int = int(environ.get("QDRANT_PORT", "6333")[-4:])
 
-    CHUNK_SIZE: int = int(environ.get("CHUNK_SIZE", "800"))
-    CHUNK_OVERLAP: int = int(environ.get("CHUNK_OVERLAP", "200"))
+    CHUNK_SIZE: int = int(environ.get("CHUNK_SIZE", "400"))
+    CHUNK_OVERLAP: int = int(environ.get("CHUNK_OVERLAP", "50"))
 
-    B2_KEY_ID: str = environ.get("B2_KEY_ID", None)
-    B2_APPLICATION_KEY: str = environ.get("B2_APPLICATION_KEY", None)
-    B2_ENDPOINT: str = environ.get("B2_ENDPOINT", None)
-    B2_BUCKET_NAME: str = environ.get("B2_BUCKET_NAME", None)
+    B2_KEY_ID: str | None = environ.get("B2_KEY_ID", None)
+    B2_APPLICATION_KEY: str | None = environ.get("B2_APPLICATION_KEY", None)
+    B2_ENDPOINT: str | None = environ.get("B2_ENDPOINT", None)
+    B2_BUCKET_NAME: str | None = environ.get("B2_BUCKET_NAME", None)
+    B2_STANDARD_PATH: str = environ.get("B2_STANDARD_PATH", "/files/")
+
+    B2_DEFAULT_COLLECTION_NAME: str = environ.get("B2_DEFAULT_COLLECTION_NAME", "documents_context")
 
     # JWT_SECRET_KEY: str = environ.get("JWT_SECRET_KEY", "secret")
     # JWT_AUDIENCE: str = environ.get("JWT_AUDIENCE", "promoters")
@@ -61,7 +64,7 @@ class DefaultSettings(BaseSettings):
         """
         Get uri for connection with vector database
         """
-        return "http://{host}:{port}"
+        return f"http://{self.QDRANT_HOST}:{self.QDRANT_PORT}"
 
     @property
     def database_settings(self) -> dict:
@@ -85,12 +88,23 @@ class DefaultSettings(BaseSettings):
             **self.database_settings,
         )
 
+    # @property
+    # def database_uri_sync(self) -> str:
+    #     """
+    #     Get uri for connection with database.
+    #     """
+    #     return "postgresql://{user}:{password}@{host}:{port}/{database}".format(
+    #         **self.database_settings,
+    #     )
+
     @property
     def database_uri_sync(self) -> str:
         """
-        Get uri for connection with database.
+        Get uri for connection with local SQLite database.
         """
-        return "postgresql://{user}:{password}@{host}:{port}/{database}".format(
+        # Предполагаем, что в self.database_settings есть ключ 'database'
+        # с именем файла (например, "local_db.sqlite3")
+        return "sqlite:///{database}".format(
             **self.database_settings,
         )
 
