@@ -9,5 +9,6 @@ class Document(BaseModel):
 
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False, unique=False)
     key: Mapped[str] = mapped_column(String, nullable=False, unique=True)
+    filename: Mapped[str] = mapped_column(String, nullable=True, unique=False)
 
     user: Mapped["User"] = relationship(back_populates="documents")
