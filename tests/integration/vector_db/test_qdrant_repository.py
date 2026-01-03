@@ -18,7 +18,6 @@ def test_generate_id_consistency():
 def test_get_points_from_chunks(mock_encoder):
     from app.infrastructure.vector_db.qdrant.utils import get_points_from_chunks
 
-    # ИСПРАВЛЕНО: Передаем ВСЕ обязательные поля ChunkBase
     chunks = [
         ChunkBase(
             content="Text 1",
@@ -35,7 +34,6 @@ def test_get_points_from_chunks(mock_encoder):
 
 
 def test_upload_points_execution(repo, mock_encoder):
-    # ИСПРАВЛЕНО: Данные для валидации
     chunks = [
         ChunkBase(
             content="data",
@@ -52,7 +50,6 @@ def test_upload_points_execution(repo, mock_encoder):
 def test_get_chunks_from_scored_points():
     from app.infrastructure.vector_db.qdrant.utils import get_chunks_from_scored_points
 
-    # ИСПРАВЛЕНО: Payload должен содержать все поля для ChunkBase
     mock_scored_points = [
         models.ScoredPoint(
             id=1,
@@ -75,7 +72,6 @@ def test_get_chunks_from_scored_points():
 @patch('app.infrastructure.vector_db.qdrant.docs_repository.get_chunks_from_scored_points')
 def test_search_calls_proper_methods(mock_get_chunks, repo):
     """Проверяем всю цепочку поиска"""
-    # Имитируем возврат списка чанков
     mock_get_chunks.return_value = [
         ChunkBase(
             content="res",
@@ -117,7 +113,6 @@ def test_upload_points_uses_correct_params(repo):
     # Создаем мок клиента, чтобы не было ConnectError
     repo.client.upload_points = MagicMock()
 
-    # ИСПРАВЛЕНО: Добавлены все обязательные поля для валидации Pydantic
     chunks = [
         ChunkBase(
             content="test text",

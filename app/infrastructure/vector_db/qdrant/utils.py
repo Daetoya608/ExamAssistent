@@ -33,3 +33,9 @@ def get_points_from_chunks(chunks: list[ChunkBase], encoder: SentenceTransformer
 def get_chunks_from_scored_points(scored_points: list[ScoredPoint]) -> list[ChunkBase]:
     chunks = [ChunkBase(**point.payload) for point in scored_points]
     return chunks
+
+
+def get_encoder(encoder):
+    if encoder is None:
+        return SentenceTransformer('BAAI/bge-m3', device='cuda')
+    return encoder

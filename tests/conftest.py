@@ -38,24 +38,35 @@ def temp_pdf_file(tmp_path):
 
 @pytest.fixture
 def mock_encoder():
-    # ПУТЬ: убедитесь, что здесь docs_repository
-    with patch('app.infrastructure.vector_db.qdrant.docs_repository.SentenceTransformer') as mock:
-        instance = mock.return_value
-        instance.get_sentence_embedding_dimension.return_value = 1024
+    # ПАТЧИМ функцию get_encoder там, где она используется!
+    with patch('app.infrastructure.vector_db.qdrant.docs_repository.get_encoder') as mock_get:
+        mock_model = MagicMock()
+        # Имитируем размерность BGE-M3
+        mock_model.get_sentence_embedding_dimension.return_value = 1024
+
+        # Настраиваем метод encode так, чтобы он возвращал объект с методом tolist()
         mock_vector = MagicMock()
         mock_vector.tolist.return_value = [0.1] * 1024
-        instance.encode.return_value = mock_vector
-        yield instance
+        mock_model.encode.return_value = mock_vector
+
+        # get_encoder(None) вернет наш mock_model
+        mock_get.return_value = mock_model
+        yield mock_model
+
 
 @pytest.fixture
 def repo(mock_encoder):
-    # Патчим QdrantClient, чтобы он не лез в сеть
-    with patch('app.infrastructure.vector_db.qdrant.docs_repository.QdrantClient') as mock_client:
+    # Патчим клиент в месте импорта в репозитории
+    with patch('app.infrastructure.vector_db.qdrant.docs_repository.QdrantClient') as mock_client_cls:
         from app.infrastructure.vector_db.qdrant.docs_repository import QdrantFilesRepository
+
+        # Теперь при создании репозитория:
+        # 1. QdrantClient будет моком
+        # 2. get_encoder вернет наш mock_model из фикстуры выше
         repository = QdrantFilesRepository(
             collection_name="test_collection",
             qdrant_url="http://localhost:6333"
         )
-        # Явно делаем клиент моком, чтобы работал .return_value
+        # Убеждаемся, что клиент внутри - это мок
         repository.client = MagicMock()
         yield repository

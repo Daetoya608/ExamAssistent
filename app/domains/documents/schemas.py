@@ -39,7 +39,7 @@ class ChunkBase(ChunkMetadata):
 
 
 class DocumentBase(BaseModel):
-    user_id: Annotated[id | UUID, Field(description="ID владельца")]
+    user_id: Annotated[int, Field(description="ID владельца")]
     key: Annotated[str, Field(description="Ключ документа")]
 
 
@@ -52,5 +52,5 @@ class DocumentRead(BaseSchema, DocumentBase):
 
 
 class DocumentUpdate(BaseModel):
-    user_id: Annotated[id | UUID, Field(default=None)]
+    user_id: Annotated[int, Field(default=None)]
     key: Annotated[str, Field(default=None)]

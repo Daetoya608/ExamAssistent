@@ -6,14 +6,21 @@ from sentence_transformers import SentenceTransformer
 from app.domains.documents.schemas import ChunkBase
 from app.domains.vector_db.vector_db_interface import VectorDBInterface
 from app.infrastructure.vector_db.qdrant.utils import (get_qdrant_url, get_points_from_chunks,
-                                                       get_chunks_from_scored_points)
+                                                       get_chunks_from_scored_points, get_encoder)
 
 
 class QdrantFilesRepository(VectorDBInterface):
-    def __init__(self, collection_name: str, qdrant_url = None, parallel_count: int = 1, max_retries: int = 1):
+    def __init__(
+            self,
+            collection_name: str,
+            qdrant_url = None,
+            parallel_count: int = 1,
+            max_retries: int = 1,
+            encoder = None,
+    ):
         self.collection_name = collection_name
         self.client = QdrantClient(url=get_qdrant_url(qdrant_url))
-        self.encoder = SentenceTransformer('BAAI/bge-m3', device='cuda')
+        self.encoder = get_encoder(encoder)
         self.parallel_count = parallel_count
         self.max_retries = max_retries
 

@@ -40,7 +40,7 @@ class DocumentServiceBase:
     def divide_into_chunks(self, pdf_model: PDFBase) -> list[ChunkBase]:
         chunks = []
         for page_index in range(len(pdf_model.pages)):
-            page_chunks = self._divide_page_into_chunks(self._text_splitter, page_index)
+            page_chunks = self._divide_page_into_chunks(pdf_model, page_index)
             chunks.extend(page_chunks)
 
         return chunks
