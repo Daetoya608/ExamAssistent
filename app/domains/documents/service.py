@@ -6,9 +6,10 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from app.core.config.utils import get_settings
 from app.domains.documents.schemas import PDFBase, ChunkBase
+from app.domains.documents.repo_interface import DocumentRepositoryInterface
 
 
-class DocumentService:
+class DocumentServiceBase:
 
     def __init__(self, chunk_size: int = None, chunk_overlap: int = None, text_splitter = None):
         if text_splitter is None:
@@ -43,3 +44,15 @@ class DocumentService:
             chunks.extend(page_chunks)
 
         return chunks
+
+
+class DocumentService(DocumentServiceBase):
+    def __init__(
+            self,
+            document_repo: DocumentRepositoryInterface,
+            chunk_size: int = None,
+            chunk_overlap: int = None,
+            text_splitter = None
+    ):
+        super().__init__(chunk_size, chunk_overlap, text_splitter)
+        self.document_repo = document_repo

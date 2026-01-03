@@ -3,7 +3,7 @@ from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session
 
-from app.domains._base.repository import BaseCRUDInterface
+from app.domains._base.base_db_interface import BaseCRUDInterface
 from app.domains._base.exceptions import (CreateFailedException,
                                           CreateIntegrityException,
                                           CRUDException, DeleteFailedException,

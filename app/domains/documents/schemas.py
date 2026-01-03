@@ -1,6 +1,9 @@
+from uuid import UUID
 from typing import Annotated
 
 from pydantic import BaseModel, ConfigDict, Field
+
+from app.domains._base.schemas import BaseSchema
 
 
 class Metadata(BaseModel):
@@ -33,3 +36,21 @@ class ChunkMetadata(BaseModel):
 
 class ChunkBase(ChunkMetadata):
     content: Annotated[str, Field(description="Текст чанка")]
+
+
+class DocumentBase(BaseModel):
+    user_id: Annotated[id | UUID, Field(description="ID владельца")]
+    key: Annotated[str, Field(description="Ключ документа")]
+
+
+class DocumentCreate(DocumentBase):
+    pass
+
+
+class DocumentRead(BaseSchema, DocumentBase):
+    pass
+
+
+class DocumentUpdate(BaseModel):
+    user_id: Annotated[id | UUID, Field(default=None)]
+    key: Annotated[str, Field(default=None)]
