@@ -56,7 +56,7 @@ def get_app() -> FastAPI:
 app = get_app()
 
 if __name__ == "__main__":
-    repo = QdrantFilesRepository()
+    # repo = QdrantFilesRepository()
     # repo.init_storage()
     init_models_sync()
 
