@@ -17,9 +17,19 @@ from app.domains.vector_db.service import VectorDBService
 from app.domains.storage.service import StorageService
 
 
+def get_user():
+    return UserRead(
+        id=2,
+        username="zero",
+        nickname="one",
+        created_at=datetime.now(),
+        updated_at=datetime.now()
+    )
+
 
 def get_upload_document_use_case(
-        session: Session = Depends(get_sync_session)  # Твоя сессия БД
+        session: Session = Depends(get_sync_session),  # Твоя сессия БД
+        user: UserRead = Depends(get_user)
 ) -> UploadDocumentUseCase:
     # 1. Инициализируем репозитории
     user_repo = SqlUserRepository(session)

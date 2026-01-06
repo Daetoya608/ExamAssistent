@@ -65,3 +65,5 @@ class DocumentService(DocumentServiceBase):
     @staticmethod
     def generate_name():
         return uuid4()
+
+
