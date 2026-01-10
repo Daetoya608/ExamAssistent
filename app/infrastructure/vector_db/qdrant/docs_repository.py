@@ -64,16 +64,17 @@ class QdrantFilesRepository(VectorDBInterface):
     def search(
             self,
             query_text: str,
+            user_id: int,
             top_k: int = 5,
             file_id: Optional[str] = None
     ) -> List[ChunkBase]:
         if not query_text or not query_text.strip():
             return []
-        query_filter = None if file_id is None else models.Filter(
+        query_filter = models.Filter(
                 must=[
                     models.FieldCondition(
-                        key="file_id",
-                        match=models.MatchValue(value=file_id)
+                        key="user_id",
+                        match=models.MatchValue(value=user_id)
                     )
                 ]
             )

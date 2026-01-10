@@ -28,6 +28,7 @@ class PDFBase(BaseModel):
 
 
 class ChunkMetadata(BaseModel):
+    user_id: Annotated[int, Field(description="Идентификатор пользователя")]
     file_id: Annotated[str | None, Field(default=None, description="Идентификатор файла")]
     source: Annotated[str, Field(description="Название файла")]
     page_num: Annotated[int, Field(description="Номер страницы")]

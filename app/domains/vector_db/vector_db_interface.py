@@ -20,6 +20,7 @@ class VectorDBInterface(ABC):
     def search(
             self,
             query_text: str,
+            user_id: int,
             top_k: int = 5,
             file_id: Optional[str] = None
     ) -> List[ChunkBase]:

@@ -22,38 +22,37 @@ class UploadDocumentUseCase:
         self.vector_db_service = vector_db_service
 
 
-    def _upload_document(self, user_id: int, filename: str, file_obj: io.BytesIO):
+    def _upload_document(self, filename: str, file_obj: io.BytesIO):
         settings = get_settings()
         folder = settings.B2_STANDARD_PATH
         new_file_name = self.document_service.generate_name()
 
         # Получение чанков из pdf
         file_pdf = self.document_service.parser.get_pdf(file_obj, filename)
-        chunks = self.document_service.divide_into_chunks(file_pdf)
-
-        # Загрузка чанков в векторную базу данных
-        self.vector_db_service.vector_storage.upsert_batches(chunks=chunks)
+        chunks = self.document_service.divide_into_chunks(pdf_model=file_pdf)
 
         # Сохранение в хранилище
         key = self.storage_service.storage.save(file_obj, new_file_name, folder)
 
+        # Загрузка чанков в векторную базу данных
+        self.vector_db_service.vector_storage.upsert_batches(chunks=chunks)
+
         # Сохранение мета информации в бд
         document_model = DocumentCreate(
-            user_id=user_id,
+            user_id=self.document_service.user_id,
             key=key,
             filename=filename,
         )
         self.document_service.document_repo.create_sync(document_model)
 
 
-    def execute(self, user_id: int, filename: str, file_obj: io.BytesIO):
+    def execute(self, filename: str, file_obj: io.BytesIO):
         try:
             self._upload_document(
-                user_id=user_id,
                 filename=filename,
                 file_obj=file_obj
             )
             return True
         except Exception as e:
-            print("ERROR!")
+            print(f"ERROR!: {e}")
             return False

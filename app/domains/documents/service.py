@@ -24,11 +24,13 @@ class DocumentServiceBase:
         self._text_splitter = text_splitter
 
 
-    def _divide_page_into_chunks(self, pdf_model: PDFBase, page_index) -> list[ChunkBase]:
+
+    def _divide_page_into_chunks(self, pdf_model: PDFBase, page_index: int, user_id: int) -> list[ChunkBase]:
         chunks = list()
         texts = self._text_splitter.split_text(pdf_model.pages[page_index].content)
         for chunk_index, chunk_text in enumerate(texts):
             chunk_model = ChunkBase(
+                user_id=user_id,
                 content=chunk_text,
                 file_id=None,
                 source=pdf_model.pages[page_index].metadata.source,
@@ -39,10 +41,10 @@ class DocumentServiceBase:
         return chunks
 
 
-    def divide_into_chunks(self, pdf_model: PDFBase) -> list[ChunkBase]:
+    def _divide_into_chunks_by_user_id(self, pdf_model: PDFBase, user_id: int) -> list[ChunkBase]:
         chunks = []
         for page_index in range(len(pdf_model.pages)):
-            page_chunks = self._divide_page_into_chunks(pdf_model, page_index)
+            page_chunks = self._divide_page_into_chunks(pdf_model, page_index, user_id)
             chunks.extend(page_chunks)
 
         return chunks
@@ -53,6 +55,7 @@ class DocumentService(DocumentServiceBase):
             self,
             document_repo: DocumentRepositoryInterface,
             parser: ParserInterface,
+            user_id: int,
             chunk_size: int = None,
             chunk_overlap: int = None,
             text_splitter = None,
@@ -60,10 +63,12 @@ class DocumentService(DocumentServiceBase):
         super().__init__(chunk_size, chunk_overlap, text_splitter)
         self.document_repo = document_repo
         self.parser = parser
+        self.user_id = user_id
 
 
     @staticmethod
     def generate_name():
         return uuid4()
 
-
+    def divide_into_chunks(self, pdf_model: PDFBase) -> list[ChunkBase]:
+        return self._divide_into_chunks_by_user_id(pdf_model, self.user_id)

@@ -1,4 +1,5 @@
 from typing import Annotated
+from enum import Enum
 
 from pydantic import BaseModel, Field
 
@@ -22,9 +23,15 @@ class ChatUpdate(BaseModel):
     name: Annotated[str | None, Field(default=None, description="Обновленное название чата")]
 
 
+class AuthorRole(str, Enum):
+    AI = "AI"
+    HUMAN = "HUMAN"
+    SYSTEM = "SYSTEM"
+
+
 class MessageInput(BaseModel):
     text: Annotated[str, Field(description="Текст сообщения")]
-    author: Annotated[str, Field(description="Автор сообщения")]
+    author: Annotated[AuthorRole, Field(description="Автор сообщения")]
 
 
 class MessageBase(MessageInput):

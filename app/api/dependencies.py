@@ -20,8 +20,8 @@ from app.domains.storage.service import StorageService
 def get_user():
     return UserRead(
         id=2,
-        username="zero",
-        nickname="one",
+        username="daetoya",
+        nickname="zero",
         created_at=datetime.now(),
         updated_at=datetime.now()
     )
@@ -43,7 +43,7 @@ def get_upload_document_use_case(
 
     # 3. Инициализируем доменные сервисы
     user_service = UserService(user_repo)
-    document_service = DocumentService(document_repo=doc_repo, parser=parser)
+    document_service = DocumentService(document_repo=doc_repo, parser=parser, user_id=user.id)
     storage_service = StorageService(storage)
     vector_db_service = VectorDBService(vector_storage=vector_storage)
 

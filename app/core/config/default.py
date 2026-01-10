@@ -36,6 +36,9 @@ class DefaultSettings(BaseSettings):
 
     B2_DEFAULT_COLLECTION_NAME: str = environ.get("B2_DEFAULT_COLLECTION_NAME", "documents_context")
 
+    OPENAI_API_KEY: str | None = environ.get("OPENAI_API_KEY", None)
+    OPENAI_MODEL: str | None = environ.get("OPENAI_MODEL", None)
+
     # JWT_SECRET_KEY: str = environ.get("JWT_SECRET_KEY", "secret")
     # JWT_AUDIENCE: str = environ.get("JWT_AUDIENCE", "promoters")
     # JWT_ISSUER: str = environ.get("JWT_ISSUER", "promoter-app")
