@@ -7,7 +7,7 @@ from app.domains.chats.schemas import MessageRead
 
 class AgentState(BaseModel):
     """Чистое состояние агента без привязки к LangGraph"""
-    answer: str = Field(default=None, description="Ответ от llm")
+    answer: str = Field(default="", description="Ответ от llm")
     history: List[MessageRead] = Field(default_factory=list, description="Последние сообщения")
     is_need_more_context: bool = Field(default=False, description="Нужно ли искать информацию в учебных материалах?")
     find_context: str = Field(default="", description="Поисковый запрос для векторной базы данных")

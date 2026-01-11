@@ -1,8 +1,9 @@
+from loguru import logger
 from typing import List
 
 from sqlalchemy.sql import ColumnElement
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, aliased
 from sqlalchemy import select, func, desc, asc
 
 from app.infrastructure.persistence.postgres.modules._base.base_repository import CRUDRepository
@@ -49,38 +50,46 @@ class SqlChatRepository(CRUDRepository[Chat, ChatRead, ChatCreate, ChatUpdate], 
 
 
     def get_last_messages_sync(self, chat_id: int, context_length: int) -> List[MessageRead]:
+        logger.info(f"chat_id: {chat_id}, context_length: {context_length}")
         query = self._get_messages_with_limit_query(chat_id, context_length)
         result = self.session.execute(query)
-        return [MessageRead.model_validate(msg) for msg in result.scalars().all()]
+        logger.info(f"result: {result}")
 
+        all_messages = result.scalars().all()
+        logger.info(f"len = {len(all_messages)}")
+
+        for msg in all_messages:
+            logger.info(f"msg: {msg}")
+
+        res = [MessageRead.model_validate(msg) for msg in all_messages]
+
+        logger.info(f"res: {res}")
+        return res
 
     def _get_messages_with_limit_query(self, chat_id: int, context_length: int):
-        """
-        Вспомогательный метод для создания запроса с оконной функцией.
-        """
-        # 1. Вычисляем длину каждого сообщения (обрабатываем возможный None через coalesce)
+        # ... (ваши пункты 1 и 2 без изменений) ...
         msg_len = func.length(func.coalesce(self._message_model.text, ""))
-
-        # 2. Оконная функция: считаем накопительную сумму длин, идя от новых к старым
         cumulative_len = func.sum(msg_len).over(
             partition_by=self._message_model.chat_id,
             order_by=desc(self._message_model.id)
         ).label("running_total")
 
-        # 3. Создаем подзапрос, где для каждого сообщения уже посчитана его "позиция" в лимите
+        # 3. Создаем подзапрос
         subquery = (
             select(
-                self._message_model,
+                self._message_model,  # Здесь выбираются все колонки модели
                 cumulative_len
             )
             .filter(self._message_model.chat_id == chat_id)
             .subquery()
         )
 
-        # 4. Основной запрос: выбираем только те строки, где сумма не превысила порог
-        # И возвращаем их в правильном хронологическом порядке (ASC)
+        # !!! ВАЖНО: Создаем алиас модели, который "смотрит" на подзапрос
+        msg_alias = aliased(self._message_model, subquery)
+
+        # 4. Выбираем алиас модели, а не просто subquery
         return (
-            select(subquery)
+            select(msg_alias)
             .filter(subquery.c.running_total <= context_length)
             .order_by(asc(subquery.c.id))
         )

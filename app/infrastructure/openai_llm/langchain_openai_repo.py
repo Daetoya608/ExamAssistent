@@ -32,7 +32,8 @@ class OpenAIRepository(LLMInterface):
 
 
     def _get_llm(self, model: str):
-        llm = ChatOpenAI(model=model)
+        settings = get_settings()
+        llm = ChatOpenAI(model=model, api_key=settings.OPENAI_API_KEY)
         return llm
 
 

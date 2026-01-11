@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field
 from app.domains._base.schemas import BaseSchema
 
 
-class ChatBase(BaseSchema):
+class ChatBase(BaseModel):
     user_id: Annotated[int, Field(description="ID владельца чата")]
     name: Annotated[str | None, Field(default=None, description="Название чата")]
 
@@ -29,8 +29,11 @@ class AuthorRole(str, Enum):
     SYSTEM = "SYSTEM"
 
 
-class MessageInput(BaseModel):
+class MessageUserInput(BaseModel):
     text: Annotated[str, Field(description="Текст сообщения")]
+
+
+class MessageInput(MessageUserInput):
     author: Annotated[AuthorRole, Field(description="Автор сообщения")]
 
 

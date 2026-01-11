@@ -1,3 +1,5 @@
+from loguru import logger
+
 from langgraph.config import RunnableConfig
 from langchain_core.output_parsers import JsonOutputParser
 
@@ -12,18 +14,24 @@ from app.infrastructure.langgraph_agent.utils import analyze_messages_prompt, co
 
 
 def get_messages_node(state: AgentState, config: RunnableConfig):
+    logger.info(f"get_messages_node")
+
     # Получаем зависимости
     chat_service: ChatService = config["configurable"]["chat_service"]
     context_length = state.context_length
 
+    logger.info(f"Получаем последние сообщения")
     # Получаем последние сообщения
     context_messages = chat_service.get_last_messages_sync(context_length)
+    logger.info(f"Полученные сообщения: {context_messages}")
 
     state.history = context_messages
     return state
 
 
 def ask_llm_node(state: AgentState, config: RunnableConfig):
+    logger.info(f"ask_llm_node")
+
     # Получение зависимостей
     llm: LLMInterface = config["configurable"]["llm"]
     parser = JsonOutputParser(pydantic_object=LLMResponse)
@@ -32,8 +40,13 @@ def ask_llm_node(state: AgentState, config: RunnableConfig):
     messages = convert_to_langchain_messages(state.history)
     prompt = analyze_messages_prompt(messages=messages, extra_context=state.extra_context, parser=parser)
 
+    logger.info(f"messages: {messages}")
+    logger.info(f"prompt: {prompt}")
+
     # Получение ответа от ллм
     answer = llm.invoke(prompt)
+
+    logger.info(f"answer: {answer}")
 
     # Парсинг ответа
     parsed_answer = parser.invoke(answer)

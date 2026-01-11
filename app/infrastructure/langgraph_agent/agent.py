@@ -1,3 +1,5 @@
+import threading
+
 from langchain_core.runnables import RunnableConfig
 from langgraph.graph import StateGraph, START, END
 
@@ -13,6 +15,18 @@ from app.infrastructure.langgraph_agent.nodes import (get_messages_node, ask_llm
 class LangGraphAIAgent(AgentInterface):
     def __init__(self):
         self.graph = self._build_graph()
+
+    _instance = None
+    _lock = threading.Lock()
+
+    def __new__(cls):
+        # Потокобезопасный синглтон
+        with cls._lock:
+            if cls._instance is None:
+                cls._instance = super(LangGraphAIAgent, cls).__new__(cls)
+                # Компилируем граф только один раз при первом создании
+                cls._instance.graph = cls._instance._build_graph()
+        return cls._instance
 
 
     def _build_graph(self):
@@ -62,4 +76,7 @@ class LangGraphAIAgent(AgentInterface):
         return response["answer"]
 
 
-graph = LangGraphAIAgent()
+_agent_instance = LangGraphAIAgent()
+
+def get_agent():
+    return _agent_instance

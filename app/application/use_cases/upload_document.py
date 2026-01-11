@@ -45,6 +45,8 @@ class UploadDocumentUseCase:
         )
         self.document_service.document_repo.create_sync(document_model)
 
+        return True
+
 
     def execute(self, filename: str, file_obj: io.BytesIO):
         try:

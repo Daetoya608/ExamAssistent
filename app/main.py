@@ -3,7 +3,8 @@ from logging import getLogger
 from fastapi import FastAPI
 from uvicorn import run
 
-from app.api.v1.documents import router
+from app.api.v1.documents import router as doc_router
+from app.api.v1.chat import router as chat_router
 from app.core.config.default import DefaultSettings
 from app.core.config.utils import get_settings, get_hostname
 
@@ -17,7 +18,8 @@ def bind_routes(application: FastAPI, setting: DefaultSettings) -> None:
     """
     Bind all routes to application.
     """
-    application.include_router(router)
+    application.include_router(doc_router)
+    application.include_router(chat_router)
     # for route in list_of_routes:
     #     application.include_router(route, prefix=setting.PATH_PREFIX)
 
